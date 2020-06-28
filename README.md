@@ -1,11 +1,12 @@
-API для приложения с опросами
+###API для приложения с опросами
 
 команда для локального запуска:
 manage.py runserver
 
 **Инструкция к API**
 
-все пути url указаны без localhost/ в начале, атрибуты в <>
+
+Все пути url указаны без localhost/ в начале, атрибуты в <>
 
 1. Идентификация пользователя, GET
 
@@ -63,13 +64,13 @@ manage.py runserver
 
 Возвращает id записанного ответа
 
-пример текстовый ответ:
+пример- текстовый ответ:
 
-http://127.0.0.1:8000/461869364870/3/myself
+> http://127.0.0.1:8000/461869364870/3/myself
 
 пример ответ из нескольки вариантов:
 
-http://127.0.0.1:8000/461869364870/5/7&8
+> http://127.0.0.1:8000/461869364870/5/7&8
 
 
 7. Отметить опрос как пройденый пользователем, GET
@@ -80,7 +81,7 @@ http://127.0.0.1:8000/461869364870/5/7&8
 
 пример:
 
-http://127.0.0.1:8000/461869364870/USA Politics/complete
+> http://127.0.0.1:8000/461869364870/USA Politics/complete
 
 **Изменение и добавление опросов**
 
@@ -115,7 +116,7 @@ Value: "TOKEN 72df72413b44119baa1b8a947423458d27f0c3c2"
 
 пример:
 
-http://127.0.0.1:8000/surveys/create_survey/foreign languages&language proficiency survey
+> http://127.0.0.1:8000/surveys/create_survey/foreign languages&language proficiency survey
 
 2. Назначить даты опроса, PUT
 
@@ -129,7 +130,7 @@ start и end могут принимать параметр now, который 
 
 пример:
 
-http://127.0.0.1:8000/surveys/set_survey_date/foreign languages/now&2020-08-10
+> http://127.0.0.1:8000/surveys/set_survey_date/foreign languages/now&2020-08-10
 
 3.Изменить название/описание опроса, PUT
 
@@ -141,7 +142,7 @@ http://127.0.0.1:8000/surveys/set_survey_date/foreign languages/now&2020-08-10
 
 пример:
 
-http://127.0.0.1:8000/update_survey/foreign languages&updated survey&updated
+> http://127.0.0.1:8000/update_survey/foreign languages&updated survey&updated
 
 4. Добавить вопрос, POST
 
@@ -151,7 +152,7 @@ question_text - Текст вопроса, type - тип в виде цифры 
 
 пример:
 
-http://127.0.0.1:8000/surveys/foreign languages/add/Do you speak any foreign languages&2/
+> http://127.0.0.1:8000/surveys/foreign languages/add/Do you speak any foreign languages&2/
 
 5. Удалить опрос, DELETE
 
@@ -159,4 +160,4 @@ http://127.0.0.1:8000/surveys/foreign languages/add/Do you speak any foreign lan
 
 пример:
 
-http://127.0.0.1:8000/surveys/delete/foreign languages
+> http://127.0.0.1:8000/surveys/delete/foreign languages
