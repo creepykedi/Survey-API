@@ -134,11 +134,8 @@ def write_answer(request, person_hash, question_id, answer):
     if request.method == "POST":
         person = Person.objects.get(hash=person_hash)
         question = Question.objects.get(pk=question_id)
-        print(person.hash)
-        print(question.type)
         if question.type == str(1):
             ans = AnswerOption.objects.get(pk=answer)
-            print(ans)
             a = GivenAnswer.objects.create(person=person, question=question)
             a.chosen_answer.add(ans)
             a.save()
@@ -152,7 +149,6 @@ def write_answer(request, person_hash, question_id, answer):
                 a.save()
                 id = a.id
         elif question.type == str(3):
-            print(answer)
             a = GivenAnswer.objects.create(person=person, question=question, given_answer=answer)
             a.save()
             id = a.id
