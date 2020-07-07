@@ -26,7 +26,8 @@ def create_person_hash(request):
 @api_view(["DELETE"])
 @permission_classes([permissions.IsAdminUser])
 @authentication_classes([authentication.TokenAuthentication])
-def delete_survey(request, survey_name):
+def delete_survey(request):
+    survey_name = request.data['survey']
     s = Survey.objects.get(name=survey_name)
     s.delete()
     return Response({'message': 'Survey has been deleted.'})
@@ -35,62 +36,72 @@ def delete_survey(request, survey_name):
 @api_view(["POST"])
 @permission_classes([permissions.IsAdminUser])
 @authentication_classes([authentication.TokenAuthentication])
-def create_survey(request, survey_name, description):
-    if request.method == "POST":
-        survey_name = survey_name.strip()
-        description = description.strip()
-        new_survey = Survey.objects.create(name=survey_name, description=description)
-        new_survey.save()
-        serializer = SurveySerializer(new_survey)
-        return JsonResponse(serializer.data)
+def create_survey(request):
+    survey_name = request.data['survey']
+    survey_name = survey_name.strip()
+    description = request.data['description']
+    description = description.strip()
+    new_survey = Survey.objects.create(name=survey_name, description=description)
+    new_survey.save()
+    serializer = SurveySerializer(new_survey)
+    return JsonResponse(serializer.data)
 
 
 @api_view(["PUT"])
 @permission_classes([permissions.IsAdminUser])
 @authentication_classes([authentication.TokenAuthentication])
-def update_survey(request, survey_name, new_name, new_desc):
-    if request.method == "PUT":
-        survey = Survey.objects.get(name=survey_name)
-        if survey and not survey.start_date:
-            survey.name = new_name
-            survey.description = new_desc
-        elif survey.start_date:
-            raise PermissionDenied
-        survey.save()
-        serializer = SurveySerializer(survey)
-        return JsonResponse(serializer.data)
+def update_survey(request):
+    survey_name = request.data['survey name']
+    new_name = request.data['new name']
+    new_desc = request.data['description']
+    survey = Survey.objects.get(name=survey_name)
+    if survey and not survey.start_date:
+        survey.name = new_name
+        survey.description = new_desc
+    elif survey.start_date:
+        raise PermissionDenied
+    survey.save()
+    serializer = SurveySerializer(survey)
+    return JsonResponse(serializer.data)
 
 
 @api_view(["PUT"])
 @permission_classes([permissions.IsAdminUser])
 @authentication_classes([authentication.TokenAuthentication])
-def set_survey_date(request, survey_name, start, end):
-    if request.method == "PUT":
-        survey = Survey.objects.get(name=survey_name)
-        if start == "now":
-            survey.start_date = current_time_str
-        else:
-            survey.start_date = start
-        if end == "now":
-            survey.end_date = current_time_str
-        else:
-            survey.end_date = end
-        # format YYYY-MM-DD
-        survey.save()
-        serializer = SurveySerializer(survey)
-        return JsonResponse(serializer.data)
+def set_survey_date(request):
+    survey_name = request.data['survey name']
+    survey = Survey.objects.get(name=survey_name)
+    start = request.data['start']
+    end = request.data['end']
+    if start == "now":
+        survey.start_date = current_time_str
+    else:
+        survey.start_date = start
+    if end == "now":
+        survey.end_date = current_time_str
+    else:
+        survey.end_date = end
+    # format YYYY-MM-DD
+    survey.save()
+    serializer = SurveySerializer(survey)
+    return JsonResponse(serializer.data)
 
 
 @api_view(["POST"])
 @permission_classes([permissions.IsAdminUser])
 @authentication_classes([authentication.TokenAuthentication])
-def add_question(request, survey_name, question_text, type):
-    survey = Survey.objects.get(name=survey_name)
-    question = Question.objects.create(question_text=question_text, survey=survey)
-    question.type = type
-    question.save()
-    serializer = QuestionSerializer(question)
-    return JsonResponse(serializer.data)
+def add_question(request):
+    if request.method == "POST":
+        question_text = request.data['question text']
+        survey_name = request.data['survey name']
+        type_ = request.data['type']
+
+        survey = Survey.objects.get(name=survey_name)
+        question = Question.objects.create(question_text=question_text, survey=survey)
+        question.type = type_
+        question.save()
+        serializer = QuestionSerializer(data=request.POST) #we can also access through request.data
+        return JsonResponse(serializer.data)
 
 
 def get_active_surveys(request):
@@ -130,8 +141,13 @@ def complete_survey(request, person_hash, survey_name):
     person.save()
 
 @csrf_exempt
-def write_answer(request, person_hash, question_id, answer):
+@api_view(['POST'])
+@permission_classes([permissions.BasePermission])
+def write_answer(request):
     if request.method == "POST":
+        person_hash = request.data['person']
+        question_id = request.data['question id']
+        answer = request.data['answer']
         person = Person.objects.get(hash=person_hash)
         question = Question.objects.get(pk=question_id)
         if question.type == str(1):
