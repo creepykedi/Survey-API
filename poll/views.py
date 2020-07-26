@@ -111,6 +111,8 @@ def start_survey(request, survey_name):
     q_serializer = QuestionSerializer(questions, many=True)
 
     if not Person.objects.filter(session_id=request.session.session_key):
+        request.session.set_expiry(2628003)
+        request.session.save()
         Person(session_id=request.session.session_key).save()
 
     return JsonResponse([s_serializer.data, q_serializer.data], safe=False)
