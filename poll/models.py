@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-import random
 
 
 class Survey(models.Model):
@@ -40,15 +39,11 @@ class Question(models.Model):
 
 
 class Person(models.Model):
-    hash = models.IntegerField(default=0, unique=True)
     completed_surveys = models.ManyToManyField(Survey, blank=True)
-
-    def generate_hash(self):
-        self.hash = int(''.join(str(random.randint(0, 9)) for _ in range(12)))
-        return self.hash
+    session_id = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
-        return f"{self.hash}"
+        return f"{self.session_id}"
 
 
 class GivenAnswer(models.Model):

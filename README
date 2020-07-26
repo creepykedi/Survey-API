@@ -32,7 +32,9 @@ start_survey/<survey_name>/<person_hash>
 Ответы на вопросы типов 1 и 2 попадают в "chosen answer". Ответы в текстовой форме попадают в "given answer".
 
 6. Записать ответ пользователя, POST
+
 survey/write/
+
 в теле запроса передать:
 question_id - id вопроса,
 answer - ответ в одном из форматов:

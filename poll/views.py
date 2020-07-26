@@ -14,14 +14,6 @@ current_time = timezone.now()
 current_time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-def create_person_hash(request):
-    p = Person()
-    h = Person.generate_hash(p)
-    p.hash = h
-    p.save()
-    serializer = PersonSerializer(p)
-    return JsonResponse(serializer.data)
-
 
 @api_view(["DELETE"])
 @permission_classes([permissions.IsAdminUser])
@@ -111,32 +103,40 @@ def get_active_surveys(request):
     return JsonResponse(serializer.data, safe=False)
 
 
-def start_survey(request, survey_name, person_hash):
+@csrf_exempt
+def start_survey(request, survey_name):
     survey = Survey.objects.get(name=survey_name)
     questions = Question.objects.filter(survey=survey)
     s_serializer = SurveySerializer(survey)
     q_serializer = QuestionSerializer(questions, many=True)
+
+    if not Person.objects.filter(session_id=request.session.session_key):
+        Person(session_id=request.session.session_key).save()
+
     return JsonResponse([s_serializer.data, q_serializer.data], safe=False)
 
 
-def get_answers(request, person_hash, survey_name):
+def get_answers(request, survey_name):
     survey = Survey.objects.get(name=survey_name)
-    person = Person.objects.get(hash=person_hash)
+    print(request.session.session_key)
+    person = Person.objects.get(session_id=request.session.session_key)
     answers = GivenAnswer.objects.filter(person=person, question__survey=survey)
     serializer = GivenAnswersSerializer(answers, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 
-def get_completed_surveys(request, person_hash):
-    p = Person.objects.get(hash=person_hash)
+def get_completed_surveys(request):
+    p = Person.objects.get(session_id__contains=request.session.session_key)
     completed = p.completed_surveys.values()
     serializer = SurveySerializer(completed, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 
-def complete_survey(request, person_hash, survey_name):
+def complete_survey(request, survey_name):
     survey = Survey.objects.get(name=survey_name)
-    person = Person.objects.get(hash=person_hash)
+
+    person = Person.objects.get(session_id=request.session.session_key)
+
     person.completed_surveys.add(survey)
     person.save()
 
@@ -145,10 +145,9 @@ def complete_survey(request, person_hash, survey_name):
 @permission_classes([permissions.BasePermission])
 def write_answer(request):
     if request.method == "POST":
-        person_hash = request.data['person']
         question_id = request.data['question id']
         answer = request.data['answer']
-        person = Person.objects.get(hash=person_hash)
+        person = Person.objects.get(session_id=request.session.session_key)
         question = Question.objects.get(pk=question_id)
         if question.type == str(1):
             ans = AnswerOption.objects.get(pk=answer)
