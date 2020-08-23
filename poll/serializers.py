@@ -19,7 +19,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ['question_text', 'type', 'answer_options']
+        fields = ['id', 'question_text', 'type', 'answer_options']
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -38,4 +38,3 @@ class GivenAnswersSerializer(serializers.ModelSerializer):
     class Meta:
         model = GivenAnswer
         fields = ['given_answer', 'chosen_answer', 'question', 'person']
-

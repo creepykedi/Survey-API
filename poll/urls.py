@@ -25,7 +25,7 @@ urlpatterns = [
     path('surveys/set_survey_date/', views.set_survey_date),
     path('update_survey/', views.update_survey),
     path('surveys/active', views.get_active_surveys),
-    path('start_survey/<survey_name>/', views.start_survey),
+    path('surveys/start/<survey_name>/', views.start_survey),
     path('surveys/add/', views.add_question),
     path('surveys/completed', views.get_completed_surveys),
     path('surveys/<survey_name>/', views.get_answers),

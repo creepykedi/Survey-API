@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, authentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from .serializers import *
 import datetime
-
+from rest_framework.authtoken.models import Token
 
 current_time = timezone.now()
 current_time_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -111,6 +111,9 @@ def start_survey(request, survey_name):
     q_serializer = QuestionSerializer(questions, many=True)
 
     if not Person.objects.filter(session_id=request.session.session_key):
+        #p = Person.objects.create()
+        # token = Token.objects.create(user=p)
+        # print(token.key)
         request.session.set_expiry(2628003)
         request.session.save()
         Person(session_id=request.session.session_key).save()
@@ -147,8 +150,8 @@ def complete_survey(request, survey_name):
 @permission_classes([permissions.BasePermission])
 def write_answer(request):
     if request.method == "POST":
-        question_id = request.data['question id']
         answer = request.data['answer']
+        question_id = request.data['question id']
         person = Person.objects.get(session_id=request.session.session_key)
         question = Question.objects.get(pk=question_id)
         if question.type == str(1):
@@ -169,4 +172,5 @@ def write_answer(request):
             a = GivenAnswer.objects.create(person=person, question=question, given_answer=answer)
             a.save()
             id = a.id
+   # JsonResponse["Access-Control-Allow-Origin"] = True
     return JsonResponse({'id': id})

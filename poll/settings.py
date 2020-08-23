@@ -40,9 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,13 +53,31 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
-SESSION_COOKIE_HTTPONLY = True
+#SESSION_COOKIE_HTTPONLY = True
 ROOT_URLCONF = 'poll.urls'
+
+CORS_ALLOW_HEADERS = (
+        'Access-Control-Allow-Headers',
+        'Access-Control-Allow-Credentials',
+        'Access-Control-Allow-Content-Type',
+        'Content-Type'
+    )
+SESSION_COOKIE_SAMESITE = None
+CSRF_COOKIE_SAMESITE = None
+CSRF_COOKIE_SECURE = True
+
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = ('http://127.0.0.1:8000', 'http://192.168.1.60:8081', 'https://localhost:8081')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': (
